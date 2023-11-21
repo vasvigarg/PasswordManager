@@ -109,12 +109,10 @@ void saveToCSV(const string &loggeduser, const vector<PasswordEntry> &entries)
     cout << "Error opening " << loggeduser << " database for writing." << endl;
     return;
   }
-
   for (const auto &entry : entries)
   {
     file << entry.website << "," << entry.username << "," << entry.password << "\n";
   }
-
   file.close();
 }
 
@@ -122,6 +120,7 @@ vector<PasswordEntry> readFromCSV(const string &loggeduser)
 {
   vector<PasswordEntry> userEntries;
   ifstream file(loggeduser + "_data.csv");
+  
   if (!file.is_open())
   {
     cout << "Error opening " << loggeduser << " database for reading." << endl;
@@ -141,6 +140,7 @@ vector<PasswordEntry> readFromCSV(const string &loggeduser)
   }
 
   file.close();
+  saveToCSV(loggeduser, userEntries);
   return userEntries;
 }
 
@@ -175,6 +175,10 @@ void viewPasswordEntries(const string &loggeduser, const string &website, const 
 
 void updatePasswordEntry(const string &loggeduser, const string &website, const string &newPassword, const string &username)
 {
+  string oldPassword;
+  cout << ">> Enter your old password: ";
+  cin >> oldPassword;
+
   vector<PasswordEntry> userEntries = readFromCSV(loggeduser);
   for (auto &entry : userEntries)
   {
@@ -184,7 +188,7 @@ void updatePasswordEntry(const string &loggeduser, const string &website, const 
       saveToCSV(loggeduser, userEntries);
       return;
     }
-  }
+  }cout << "Old password incorrect or website not found. Password update failed." << endl;
 }
 
 void deletePasswordEntry(const string &loggeduser, const string &website, const string &username)
@@ -199,6 +203,13 @@ void deletePasswordEntry(const string &loggeduser, const string &website, const 
 }
 
 // frontend of the application
+
+bool validateWebsite(const string &website) {
+    // Check if the website contains ".com"
+    size_t found = website.find(".com");
+    return (found != string::npos);
+}
+
 void dashboard(string loggedUser)
 {
   int choice;
@@ -236,6 +247,10 @@ void dashboard(string loggedUser)
     case 1:
       cout << ">> Enter website: ";
       cin >> website;
+      if (!validateWebsite(website)) {
+          cout << "Invalid website format. Please enter a website with '.com'." << endl;
+            break;
+        }
       cout << ">> Enter username: ";
       cin >> username;
       cout << ">> Enter password: ";
@@ -404,7 +419,7 @@ int main()
 
     case 2:
       // signup for the new account
-      cout << ">> Enter your full name: ";
+      cout << ">> Enter your name: ";
       cin.ignore();
       getline(cin, name);   
       cout << ">> Enter your unique username: ";
