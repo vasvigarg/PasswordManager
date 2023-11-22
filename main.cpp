@@ -111,6 +111,7 @@ void saveToCSV(const string &loggeduser, const vector<PasswordEntry> &entries)
   }
   for (const auto &entry : entries)
   {
+    string pass = encryptCaesarCipher(entry.password, 5);
     file << entry.website << "," << entry.username << "," << entry.password << "\n";
   }
   file.close();
@@ -310,7 +311,6 @@ void dashboard(string loggedUser)
 
 void signup(const string &name, const string &username, const string &email, const string &password)
 {
-
   try
   {
     ofstream file("userdetails.csv", ios::app);
